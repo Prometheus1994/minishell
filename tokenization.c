@@ -140,7 +140,7 @@ t_token *parse_input(char *str)
 	t_command		*command_list;
 	t_command		*current_command;
 	t_command		*command;
-	t_redirection	*redirection_list;
+	t_redirection	*redirection_list = NULL;
 	t_redirection	*current_redirection;
 	t_redirection	*redirection;
 	char			**args;

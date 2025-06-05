@@ -6,7 +6,7 @@
 /*   By: ytlidi <ytlidi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 15:19:54 by ytlidi            #+#    #+#             */
-/*   Updated: 2025/06/05 17:43:57 by ytlidi           ###   ########.fr       */
+/*   Updated: 2025/06/05 19:08:13 by ytlidi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,13 +28,13 @@ void	ft_lstadd_back_token(t_token **lst, t_token *new)
 	new -> next = NULL;
 }
 
-void	ft_lstadd_back_command(t_command *lst, t_command *new)
+void	ft_lstadd_back_command(t_command **lst, t_command *new)
 {
 	t_command	*current;
 
-	current = lst;
-	if (lst == NULL)
-		lst = new;
+	current = *lst;
+	if (*lst == NULL)
+		*lst = new;
 	else
 	{
 		while (current -> next != NULL)

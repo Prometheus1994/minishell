@@ -6,7 +6,7 @@
 /*   By: ytlidi <ytlidi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/30 19:44:49 by ytlidi            #+#    #+#             */
-/*   Updated: 2025/06/05 13:34:56 by ytlidi           ###   ########.fr       */
+/*   Updated: 2025/06/05 19:05:02 by ytlidi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ char	*ft_strdup(const char *src)
 	char	*p;
 
 	i = 0;
-	p = malloc(ft_strlen(src));
+	p = malloc(ft_strlen(src) + 1);
 	if (p == NULL)
 		return (NULL);
 	while (src[i] != '\0')
