@@ -177,7 +177,7 @@ t_token *parse_input(char *str)
 	}
 	// ft_lstadd_back_command(command_list, command);
 		printf("Here\n");
-	while (current_token && current_token->type != TOKEN_PIPE && current_token != NULL)
+	while (current_token->type != TOKEN_PIPE && current_token != NULL)
 	{
 		redirection = NULL;
 		if (current_token && current_token->type >= 4 && current_token->type <= 7)
