@@ -6,7 +6,7 @@
 /*   By: ytlidi <ytlidi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 16:41:42 by ytlidi            #+#    #+#             */
-/*   Updated: 2025/06/05 19:08:42 by ytlidi           ###   ########.fr       */
+/*   Updated: 2025/06/06 14:38:38 by ytlidi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,8 +21,8 @@ typedef enum s_tokens
 	TOKEN_S_QUOTE,
 	TOKEN_D_QUOTE,
 	TOKEN_PIPE,
-	TOKEN_RD_IN,
 	TOKEN_RD_OUT,
+	TOKEN_RD_IN,
 	TOKEN_APPEND,
 	TOKEN_HEREDOC,
 }	t_tokens;
@@ -50,7 +50,7 @@ typedef struct s_command
 }	t_command;
 
 t_token			*ft_lstnew_token(char *token);
-t_command		*ft_lstnew_command(char **args);t_redirection *ft_lstnew_rediretion(int type, char *file);
+t_command		*ft_lstnew_command(char **args);
 t_redirection	*ft_lstnew_redirection(int type, char *file);
 void			ft_lstadd_back_token(t_token **lst, t_token *new);
 void			ft_lstadd_back_command(t_command **lst, t_command *new);

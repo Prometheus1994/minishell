@@ -45,9 +45,9 @@ void filling_type_pipe_or_rd(t_token *list)
 		if (list->token[0] == '|')
 			list->type = TOKEN_PIPE;
 		if (list->token[0] == '>')
-			list->type = TOKEN_RD_IN;
-		if (list->token[0] == '<')
 			list->type = TOKEN_RD_OUT;
+		if (list->token[0] == '<')
+			list->type = TOKEN_RD_IN;
 	}
 	else
 	{
@@ -133,6 +133,15 @@ int words_count(t_token *beginning)
 	return i;
 }
 
+void display_redirection_list(t_redirection *head) {
+    t_redirection *current = head;
+    while (current != NULL) {
+        printf("%s(%d) -> ", current->file, current->type);
+        current = current->next;
+    }
+    printf("NULL\n");
+}
+
 t_token *parse_input(char *str)
 {
 	t_token			*token_list;
@@ -140,7 +149,7 @@ t_token *parse_input(char *str)
 	t_command		*command_list;
 	t_command		*current_command;
 	t_command		*command;
-	t_redirection	*redirection_list = NULL;
+	t_redirection	*redirection_list;
 	t_redirection	*current_redirection;
 	t_redirection	*redirection;
 	char			**args;
@@ -159,48 +168,56 @@ t_token *parse_input(char *str)
 	}
 	command_list = NULL;
 	current_token = token_list;
-	args = malloc(sizeof(char *) * (words_count(token_list) + 1));
-	i = 0;
-	while (current_token != NULL && current_token->type == TOKEN_WORD)
+	while (current_token != NULL)
 	{
-		args[i] = ft_strdup(current_token->token);
-		current_token = current_token->next;
-		i++;
+		args = malloc(sizeof(char *) * (words_count(token_list) + 1));
+		i = 0;
+		while (current_token != NULL && current_token->type < 3)
+		{
+			args[i] = ft_strdup(current_token->token);
+			current_token = current_token->next;
+			i++;
+		}
+		args[i] = NULL;
+		command = ft_lstnew_command(args);
+		i = 0;
+	//	while (command->args[i])
+	//	{
+	//		printf("%s\n",command->args[i]);
+	//		i++;
+	//	}
+	//		printf("Here\n");
+		redirection_list = NULL;
+		while (current_token != NULL && current_token->type != TOKEN_PIPE)
+		{
+			redirection = NULL;
+			if (current_token != NULL && current_token->type >= 4 && current_token->type <= 7)
+				redirection = ft_lstnew_redirection(current_token->type, current_token->next->token);
+			ft_lstadd_back_redirection(&redirection_list, redirection);
+			current_token = current_token->next->next;
+		}
+	//	display_redirection_list(redirection_list);
+		command->rds = redirection_list;
+		ft_lstadd_back_command(&command_list, command);
+		if (current_token != NULL && current_token->type == TOKEN_PIPE)
+			current_token = current_token->next;
 	}
-	args[i] = NULL;
-	command = ft_lstnew_command(args);
-	i = 0;
-	while (command->args[i])
+	while (command_list)
 	{
-		printf("%s\n",command->args[i]);
-		i++;
+		printf("cmd : %s\n", command_list->command);
+		int test = 0;
+		while (command_list->args[test])
+		{
+			printf("args : %s\n", command_list->args[test]);
+			test++;
+		}
+		if (command_list->rds)
+		{
+			printf("rds : ");
+			display_redirection_list(command_list->rds);
+		}
+		command_list = command_list->next;
+		printf("\n");
 	}
-	// ft_lstadd_back_command(command_list, command);
-		printf("Here\n");
-	while (current_token->type != TOKEN_PIPE && current_token != NULL)
-	{
-		redirection = NULL;
-		if (current_token && current_token->type >= 4 && current_token->type <= 7)
-			redirection = ft_lstnew_redirection(current_token->type, current_token->next->token);
-		ft_lstadd_back_redirection(&redirection_list, redirection);
-		current_token = current_token->next->next;
-	}
-	/////////////////////////////////////////////
-/*	current_token = token_list;
-	current_command->command = current_token->token;
-	i = 0;
-	printf("test\n");
-	while (current_token && current_token->type == TOKEN_WORD)
-	{
-		current_command->args[i] = current_token->token;
-		current_token = current_token->next;
-		i++;
-	}
-	current_command->args[i] = NULL;*/
-	// if (current_token->type == TOKEN_PIPE)
-	// {
-	// 	current_command = current_command->next;
-	// }
-	//	if 
 	return (token_list);
 }
