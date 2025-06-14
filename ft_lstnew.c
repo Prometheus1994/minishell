@@ -6,7 +6,7 @@
 /*   By: ytlidi <ytlidi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/12 16:40:45 by ytlidi            #+#    #+#             */
-/*   Updated: 2025/06/06 12:40:42 by ytlidi           ###   ########.fr       */
+/*   Updated: 2025/06/13 14:34:18 by ytlidi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@ t_token	*ft_lstnew_token(char *token)
 	new_node = malloc(sizeof(t_token));
 	new_node -> token = token;
 	new_node -> next = NULL;
+	// new_node -> prev = NULL;
 	return (new_node);
 }
 
@@ -42,9 +43,4 @@ t_redirection *ft_lstnew_redirection(int type, char *file)
 	new_node -> file = file;
 	new_node -> next = NULL;
 	return (new_node);
-}
-
-void add_redirection_to_command(t_command *cmd, t_redirection *rds)
-{
-	cmd->rds = rds;
 }

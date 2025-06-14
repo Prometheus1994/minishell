@@ -6,7 +6,7 @@
 /*   By: ytlidi <ytlidi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/30 19:44:49 by ytlidi            #+#    #+#             */
-/*   Updated: 2025/06/05 19:05:02 by ytlidi           ###   ########.fr       */
+/*   Updated: 2025/06/13 14:22:47 by ytlidi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 #include <string.h>
 #include "minishell.h"
 
-char	*ft_strdup(const char *src)
+char	*ft_strdup(char *src)
 {
 	int		i;
 	char	*p;
@@ -29,5 +29,6 @@ char	*ft_strdup(const char *src)
 		i++;
 	}
 	p[i] = '\0';
+	free(src);
 	return (p);
 }
