@@ -9,35 +9,49 @@ void display_list(t_token *head) {
     printf("NULL\n");
 }
 
-int main()
-{
-	char	*input;
-	t_token *str;
+void display_redirection_list(t_redirection *head) {
+    t_redirection *current = head;
+    while (current != NULL) {
+        printf("%s(%d) -> ", current->filename_or_delimiter, current->type);
+        current = current->next;
+    }
+    printf("NULL\n");
+}
 
-	while (1)
+int main(int argc, char *argv[], char **envp)
+{
+	char		*input;
+	t_command	*cmd;
+	t_env		*env;
+
+	env = init_env(envp);
+	if (!env)
+		return (1);
+	while(1)
 	{
-		input = readline("minishell$ "); 
+		input = readline("minishell$ ");
 		add_history(input);
 		if (!input)
 			break;
-		str = parse_input(input);
+		cmd = parse_input(input, env); // when pars_input return NULL which mean fails 
 		// display_list(str);
+		while (cmd)
+		{
+			int test = 0;
+			while (cmd->args[test])
+			{
+				printf("args : %s\n", cmd->args[test]);
+				test++;
+			}
+			if (cmd->rds)
+			{
+				printf("rds : ");
+				display_redirection_list(cmd->rds);
+			}
+			printf("pipe_in : %d\n", cmd->pipe_in);
+			printf("pipe_out : %d\n", cmd->pipe_out);
+			cmd = cmd->next;
+			printf("\n");
+		}
 	}
 }
-
-// int main()
-// {
-// 	char	*input;
-// //	t_cmd	*cmd;
-
-// 	while (1)
-// 	{
-// 		input = readline("minishell$ "); 
-// 		if (!input)
-// 			break;
-// 		cmd = parse_input(input)
-// 		if (!cmd)
-// 			continue;
-// 		execute(cmd);
-// 	}
-// }

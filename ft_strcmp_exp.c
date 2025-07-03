@@ -1,32 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strdup.c                                        :+:      :+:    :+:   */
+/*   ft_strcmp_exp.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mben-cha <mben-cha@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ytlidi <ytlidi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/10/30 19:44:49 by ytlidi            #+#    #+#             */
-/*   Updated: 2025/06/25 00:23:36 by mben-cha         ###   ########.fr       */
+/*   Created: 2024/08/03 12:46:11 by ytlidi            #+#    #+#             */
+/*   Updated: 2025/07/02 22:53:01 by ytlidi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include <stdio.h>
 
-char	*ft_strdup(char *src)
+int	ft_strcmp_exp(char *s1, char *s2)
 {
-	int		i;
-	char	*p;
+	unsigned int	i;
 
 	i = 0;
-	p = malloc(ft_strlen(src) + 1);
-	if (p == NULL)
-		return (NULL);
-	while (src[i] != '\0')
+	while (s1[i] == s2[i] && s2[i] != '\0')
 	{
-		p[i] = src[i];
 		i++;
 	}
-	p[i] = '\0';
-	free(src);
-	return (p);
+	if (s2[i] == '\0' && (s1[i] == ' ' || (s1[i] >= 9 && s1[i] <= 13) || s1[i] == '\0' || s1[i] == '"'))
+		return (0);
+	return (1);
 }
