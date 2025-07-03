@@ -6,7 +6,7 @@
 /*   By: ytlidi <ytlidi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 16:46:50 by ytlidi            #+#    #+#             */
-/*   Updated: 2025/07/02 22:42:14 by ytlidi           ###   ########.fr       */
+/*   Updated: 2025/07/03 18:59:54 by ytlidi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -197,6 +197,30 @@ void	expanding(char *new_str, int *j, char *str_to_add)
 	}
 }
 
+int	calc_new_str_len(char *str, t_env *env)
+{
+	int	i;
+	int len;
+	t_env	*env_line;
+
+	i = 0;
+	len = 0;
+	while (str[i] != '\0')
+	{
+		if (str[i] == '$')
+		{
+			i++;
+			len++;
+			env_line = find_env_exp(env, &str[i]);
+			if (env_line != NULL)
+				len += ft_strlen(env_line->value);
+		}
+		i++;
+		len++;
+	}
+	return len;
+}
+
 char	*remove_quote(char *str, t_env *env)
 {
 	int		i;
@@ -209,7 +233,7 @@ char	*remove_quote(char *str, t_env *env)
 	i = 0;
 	j = 0;
 	flag = 0;
-	new_str = malloc(ft_strlen(str) + 1); //free
+	new_str = malloc(calc_new_str_len(str, env) + 1); //free
 	while (str[i] != '\0')
 	{
 		if ((flag % 2 == 0 && (str[i] == '\'' || str[i] == '"'))
@@ -224,7 +248,8 @@ char	*remove_quote(char *str, t_env *env)
 		if (str[i] == '$' && ((flag % 2 == 1 && quote == '"') || flag % 2 == 0))
 		{
 			i++;
-			if ((str[i] == ' ' || (str[i] >= 9 && str[i] <= 13)) || str[i] == '\0')
+			if ((str[i] == ' ' || (str[i] >= 9 && str[i] <= 13))
+				|| str[i] == '\0' || str[i] == '"')
 			{
 				new_str[j] = '$';
 				j++;
@@ -240,8 +265,8 @@ char	*remove_quote(char *str, t_env *env)
 			{
 				expanding(new_str, &j, env_line->value);
 				i += ft_strlen(env_line->key);
+				continue;
 			}
-			// continue;
 		}
 		new_str[j] = str[i];
 		i++;
@@ -295,7 +320,7 @@ char **inner_filling_cmd_list(t_token **current_token, t_redirection **redirecti
 		}
 		else if ((*current_token)->type >= 4 && (*current_token)->type <= 7)
 		{
-			redirection = ft_lstnew_redirection((*current_token)->type, (*current_token)->next->token); //free
+			redirection = ft_lstnew_redirection((*current_token)->type, remove_quote((*current_token)->next->token, env)); //free
 			ft_lstadd_back_redirection(&redirection_list, redirection);
 			*current_token = (*current_token)->next->next;
 		}
