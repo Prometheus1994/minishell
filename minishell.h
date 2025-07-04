@@ -6,7 +6,7 @@
 /*   By: ytlidi <ytlidi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 16:41:42 by ytlidi            #+#    #+#             */
-/*   Updated: 2025/07/02 20:49:01 by ytlidi           ###   ########.fr       */
+/*   Updated: 2025/07/04 17:50:18 by ytlidi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,4 +103,4 @@ int				setup_pipe(int *pipefd);
 t_env			*init_env(char **envp);
 int				ft_strcmp_exp(char *s1, char *s2);
 t_env			*find_env_exp(t_env *env, char *key);
-int				strlen_before_spaces(char *str);
+int				strlen_before_spaces_or_delimiter(char *str);

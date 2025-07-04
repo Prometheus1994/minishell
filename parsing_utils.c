@@ -6,7 +6,7 @@
 /*   By: ytlidi <ytlidi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/02 18:38:34 by ytlidi            #+#    #+#             */
-/*   Updated: 2025/07/03 18:45:59 by ytlidi           ###   ########.fr       */
+/*   Updated: 2025/07/04 17:49:46 by ytlidi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,13 +28,14 @@ t_env	*find_env_exp(t_env *env, char *key)
 	return (NULL);
 }
 
-int	strlen_before_spaces(char *str)
+int	strlen_before_spaces_or_delimiter(char *str)
 {
 	int	i;
 
 	i = 0;
 	while (str[i] != ' ' && !(str[i] >= 9 && str[i] <= 13) && str[i] != '\0'
-		&& str[i] != '"' && str[i] != '$')
+		&& str[i] != '/' && str[i] != '$' && str[i] != '"' && str[i] != '\''
+		&& str[i] != '.' && str[i] != ',' && str[i] != ';' && str[i] != ':')
 		i++;
 	return (i);
 }

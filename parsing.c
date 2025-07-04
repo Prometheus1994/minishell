@@ -6,7 +6,7 @@
 /*   By: ytlidi <ytlidi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 16:46:50 by ytlidi            #+#    #+#             */
-/*   Updated: 2025/07/03 18:59:54 by ytlidi           ###   ########.fr       */
+/*   Updated: 2025/07/04 20:56:35 by ytlidi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,9 +33,11 @@ int quote_tokens(char *str, t_token **list, int *i)
 	if (str[*i] == '\'' || str[*i] == '"')
 	{
 		q = str[*i];
-		j = (*i)++;
+		j = *i;
+		(*i)++;
 		flag = 1;
-		while (((str[*i] != ' ' && !(str[*i] >= 9 && str[*i] <= 13)) || flag % 2 == 1) && str[*i] != '\0')
+		while (((str[*i] != ' ' && !(str[*i] >= 9 && str[*i] <= 13))
+			|| flag % 2 == 1) && str[*i] != '\0')
 		{
 			if ((flag % 2 == 0 && (str[*i] == '\'' || str[*i] == '"'))
 				|| (flag % 2 == 1 && str[*i] == q))
@@ -43,14 +45,8 @@ int quote_tokens(char *str, t_token **list, int *i)
 				q = str[*i];
 				flag++;
 			}
-			// if (str[i] == '\'' || str[i] == '"')
-			// 	flag++;
 			(*i)++;
 		}
-		// while (str[*i] != q && str[*i] != '\0')
-		// 	(*i)++;
-		//if (str[*i] == '\0')
-		//	printf("quote not closed\n");
 		if (*i > j)
 		{
 			s = ft_substr(str, j, *i - j + 1); //free
@@ -64,6 +60,7 @@ int quote_tokens(char *str, t_token **list, int *i)
 	}
 	return (0);
 }
+
 void filling_type_pipe_or_rd(t_token *list)
 {
 	if (list->token[1] == '\0')
@@ -132,8 +129,9 @@ int word_tokens(char *str, t_token **list, int *i)
 	   	
 	j = *i;
 	flag = 0;
-	while (((str[*i] != ' ' && !(str[*i] >= 9 && str[*i] <= 13) && str[*i] != '|'
-		&& str[*i] != '>' && str[*i] != '<') || flag % 2 == 1) && str[*i] != '\0')
+	while (((str[*i] != ' ' && !(str[*i] >= 9 && str[*i] <= 13)
+		&& str[*i] != '|' && str[*i] != '>' && str[*i] != '<') || flag % 2 == 1)
+		&& str[*i] != '\0')
 	{
 		if ((flag % 2 == 0 && (str[*i] == '\'' || str[*i] == '"'))
 			|| (flag % 2 == 1 && str[*i] == q))
@@ -141,8 +139,6 @@ int word_tokens(char *str, t_token **list, int *i)
 			q = str[*i];
 			flag++;
 		}
-		// if (str[i] == '\'' || str[i] == '"')
-		// 	flag++;
 		(*i)++;
 	}
 	if (*i > j)
@@ -174,15 +170,6 @@ int words_count(t_token *beginning)
 	}
 	return i;
 }
-
-// void display_redirection_list(t_redirection *head) {
-//     t_redirection *current = head;
-//     while (current != NULL) {
-//         printf("%s(%d) -> ", current->file, current->type);
-//         current = current->next;
-//     }
-//     printf("NULL\n");
-// }
 
 void	expanding(char *new_str, int *j, char *str_to_add)
 {
@@ -239,8 +226,7 @@ char	*remove_quote(char *str, t_env *env)
 		if ((flag % 2 == 0 && (str[i] == '\'' || str[i] == '"'))
 			|| (flag % 2 == 1 && str[i] == quote))
 		{
-			if (flag % 2 == 0)
-				quote = str[i];
+			quote = str[i];
 			flag++;
 			i++;
 			continue;
@@ -258,7 +244,7 @@ char	*remove_quote(char *str, t_env *env)
 			env_line = find_env_exp(env, &str[i]);
 			if (env_line == NULL)
 			{
-				i += strlen_before_spaces(&str[i]);
+				i += strlen_before_spaces_or_delimiter(&str[i]);
 				continue;
 			}
 			if (env_line != NULL)
@@ -300,7 +286,8 @@ void	filling_pipes(t_command *command, t_token *current_token)
 	}	
 }
 
-char **inner_filling_cmd_list(t_token **current_token, t_redirection **redirection_list, t_env *env)
+char **inner_filling_cmd_list(t_token **current_token,
+	t_redirection **redirection_list, t_env *env)
 {
 	t_redirection	*redirection;
 	char			**args;
@@ -313,14 +300,14 @@ char **inner_filling_cmd_list(t_token **current_token, t_redirection **redirecti
 		if (*current_token != NULL && (*current_token)->type < 3)
 		{
 			args[i] = remove_quote((*current_token)->token, env); //free
-			if (args[i] == NULL) //free function
+			if (args[i++] == NULL) //free function
 				return (NULL);
 			*current_token = (*current_token)->next;
-			i++;
 		}
 		else if ((*current_token)->type >= 4 && (*current_token)->type <= 7)
 		{
-			redirection = ft_lstnew_redirection((*current_token)->type, remove_quote((*current_token)->next->token, env)); //free
+			redirection = ft_lstnew_redirection((*current_token)->type,
+				remove_quote((*current_token)->next->token, env)); //free
 			ft_lstadd_back_redirection(&redirection_list, redirection);
 			*current_token = (*current_token)->next->next;
 		}
@@ -341,7 +328,6 @@ t_command	*filling_cmd_list(t_token *token_list, int pipe_flag, t_env *env)
 	current_token = token_list;
 	while (current_token != NULL)
 	{
-		// command = NULL;
 		redirection_list = NULL;
 		args = inner_filling_cmd_list(&current_token, &redirection_list, env);
 		if (args == NULL)
@@ -377,11 +363,6 @@ t_command	*parse_input(char *str, t_env *env)
 		if (word_tokens(str, &token_list, &i))
 			return (NULL);
 	}
-	// while (token_list)
-	// {
-	// 	printf("value: %s\n", token_list->token);
-	// 	token_list= token_list->next;
-	// }
 	if (valid_tokens(token_list))
 		return (NULL);
 	command_list = filling_cmd_list(token_list, 0, env);
