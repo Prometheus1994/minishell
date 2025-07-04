@@ -6,7 +6,7 @@
 /*   By: ytlidi <ytlidi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 16:46:50 by ytlidi            #+#    #+#             */
-/*   Updated: 2025/07/04 20:56:35 by ytlidi           ###   ########.fr       */
+/*   Updated: 2025/07/04 21:34:14 by ytlidi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -208,11 +208,12 @@ int	calc_new_str_len(char *str, t_env *env)
 	return len;
 }
 
-char	*remove_quote(char *str, t_env *env)
+char	*remove_quote(t_token *token, t_env *env)
 {
 	int		i;
 	int		j;
 	int		flag;
+	char	*str;
 	char	*new_str;
 	char	quote;
 	t_env	*env_line;
@@ -220,6 +221,10 @@ char	*remove_quote(char *str, t_env *env)
 	i = 0;
 	j = 0;
 	flag = 0;
+	if (token->type >= 4 && token->type <= 7)
+		str = token->next->token;
+	else
+		str = token->token;
 	new_str = malloc(calc_new_str_len(str, env) + 1); //free
 	while (str[i] != '\0')
 	{
@@ -231,7 +236,8 @@ char	*remove_quote(char *str, t_env *env)
 			i++;
 			continue;
 		}
-		if (str[i] == '$' && ((flag % 2 == 1 && quote == '"') || flag % 2 == 0))
+		if ((str[i] == '$' && ((flag % 2 == 1 && quote == '"')
+			|| flag % 2 == 0)) && token->type != TOKEN_HEREDOC)
 		{
 			i++;
 			if ((str[i] == ' ' || (str[i] >= 9 && str[i] <= 13))
@@ -299,7 +305,7 @@ char **inner_filling_cmd_list(t_token **current_token,
 	{
 		if (*current_token != NULL && (*current_token)->type < 3)
 		{
-			args[i] = remove_quote((*current_token)->token, env); //free
+			args[i] = remove_quote((*current_token), env); //free
 			if (args[i++] == NULL) //free function
 				return (NULL);
 			*current_token = (*current_token)->next;
@@ -307,7 +313,7 @@ char **inner_filling_cmd_list(t_token **current_token,
 		else if ((*current_token)->type >= 4 && (*current_token)->type <= 7)
 		{
 			redirection = ft_lstnew_redirection((*current_token)->type,
-				remove_quote((*current_token)->next->token, env)); //free
+				remove_quote((*current_token), env)); //free
 			ft_lstadd_back_redirection(&redirection_list, redirection);
 			*current_token = (*current_token)->next->next;
 		}
