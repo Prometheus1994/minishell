@@ -6,7 +6,7 @@
 /*   By: ytlidi <ytlidi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/05 16:02:35 by ytlidi            #+#    #+#             */
-/*   Updated: 2025/07/05 19:39:35 by ytlidi           ###   ########.fr       */
+/*   Updated: 2025/07/05 21:13:10 by ytlidi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,8 @@ int	skipping_if_quote_mark(char *str, int *i, int *flag, char *q)
 	return (continue_flag);
 }
 
-char	*remove_quote_func_init(int *i, t_token *token, char **new_str, t_env *env)
+char	*remove_quote_func_init(int *i, t_token *token, char **new_str,
+	t_env *env)
 {
 	char	*str;
 
@@ -39,4 +40,16 @@ char	*remove_quote_func_init(int *i, t_token *token, char **new_str, t_env *env)
 		str = token->token;
 	*new_str = malloc(calc_new_str_len(str, env) + 1); //free
 	return (str);
+}
+
+int	in_case_of_quote_not_closed(char *new_str, int j, int flag)
+{
+	new_str[j] = '\0';
+	if (flag % 2 == 1)
+	{
+		printf("quote not closed\n");
+		free(new_str);
+		return (1);
+	}
+	return (0);
 }

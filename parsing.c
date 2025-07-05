@@ -6,7 +6,7 @@
 /*   By: ytlidi <ytlidi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 16:46:50 by ytlidi            #+#    #+#             */
-/*   Updated: 2025/07/05 19:34:19 by ytlidi           ###   ########.fr       */
+/*   Updated: 2025/07/05 21:23:32 by ytlidi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -163,29 +163,24 @@ char	*remove_quote(t_token *token, t_env *env)
 
 	int (i), (j), (continue_flag), flag = 0;
 	j = 0;
-	remove_quote_func_init(&i, token, &new_str, env);
+	str = remove_quote_func_init(&i, token, &new_str, env);
 	while (str[i] != '\0')
 	{
 		continue_flag = skipping_if_quote_mark(str, &i, &flag, &q);
-		if ((str[i] == '$' && ((flag % 2 == 1 && q == '"')
-			|| flag % 2 == 0)) && token->type != TOKEN_HEREDOC)
+		if (expand_condition(str, i, flag, q) && token->type != TOKEN_HEREDOC)
 		{
 			continue_flag = printing_dollar(new_str, &j, str, &i);
 			env_line = find_env_exp(env, &str[i]);
-			continue_flag = expanding_to_an_empty_string(str, &i, env_line);
-			continue_flag = expanding_to_a_real_value(new_str, &j, &i, env_line);
+			continue_flag = expand_to_an_empty_string(str, &i, env_line);
+			continue_flag = expand_to_a_real_value(new_str, &j, &i, env_line);
 		}
 		if (continue_flag == 1)
-			continue;
+			continue ;
 		new_str[j++] = str[i++];
 	}
-	new_str[j] = '\0';
-	if (flag % 2 == 1)
-	{
-		printf("quote not closed\n");
-		return (free(new_str), NULL);
-	}
-	return (new_str);
+	if (in_case_of_quote_not_closed(new_str, j, flag))
+		return (free(str), NULL);
+	return (free(str), new_str);
 }
 
 void	filling_pipes(t_command *command, t_token *current_token)
@@ -220,7 +215,7 @@ char **inner_filling_cmd_list(t_token **current_token,
 	{
 		if (*current_token != NULL && (*current_token)->type < 3)
 		{
-			args[i] = remove_quote((*current_token), env); //free
+			args[i] = remove_quote(*current_token, env); //free
 			if (args[i++] == NULL) //free function
 				return (NULL);
 			*current_token = (*current_token)->next;
@@ -228,7 +223,7 @@ char **inner_filling_cmd_list(t_token **current_token,
 		else if ((*current_token)->type >= 4 && (*current_token)->type <= 7)
 		{
 			redirection = ft_lstnew_redirection((*current_token)->type,
-				remove_quote((*current_token), env)); //free
+				remove_quote(*current_token, env)); //free
 			ft_lstadd_back_redirection(&redirection_list, redirection);
 			*current_token = (*current_token)->next->next;
 		}

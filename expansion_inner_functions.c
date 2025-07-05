@@ -6,11 +6,19 @@
 /*   By: ytlidi <ytlidi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/05 12:14:29 by ytlidi            #+#    #+#             */
-/*   Updated: 2025/07/05 19:25:06 by ytlidi           ###   ########.fr       */
+/*   Updated: 2025/07/05 20:50:28 by ytlidi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+int	expand_condition(char *str, int i, int flag, char q)
+{
+	int	condition;
+
+	condition = str[i] == '$' && ((flag % 2 == 1 && q == '"') || flag % 2 == 0);
+	return (condition);
+}
 
 int	printing_dollar(char *new_str, int *j, char *str, int *i)
 {
@@ -27,7 +35,7 @@ int	printing_dollar(char *new_str, int *j, char *str, int *i)
 	return (continue_flag);
 }
 
-int	expanding_to_an_empty_string(char *str, int *i, t_env *env_line)
+int	expand_to_an_empty_string(char *str, int *i, t_env *env_line)
 {
 	int	continue_flag;
 
@@ -39,7 +47,7 @@ int	expanding_to_an_empty_string(char *str, int *i, t_env *env_line)
 	return (continue_flag);
 }
 
-int	expanding_to_a_real_value(char *new_str, int *j, int *i, t_env *env_line)
+int	expand_to_a_real_value(char *new_str, int *j, int *i, t_env *env_line)
 {
 	int	continue_flag;
 
