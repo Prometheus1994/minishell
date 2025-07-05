@@ -6,11 +6,24 @@
 /*   By: ytlidi <ytlidi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/02 18:38:34 by ytlidi            #+#    #+#             */
-/*   Updated: 2025/07/04 17:49:46 by ytlidi           ###   ########.fr       */
+/*   Updated: 2025/07/05 15:06:46 by ytlidi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+void	expanding(char *new_str, int *j, char *str_to_add)
+{
+	int	i;
+
+	i = 0;
+	while (str_to_add[i] != '\0')
+	{
+		new_str[*j] = str_to_add[i];
+		i++;
+		(*j)++;
+	}
+}
 
 t_env	*find_env_exp(t_env *env, char *key)
 {

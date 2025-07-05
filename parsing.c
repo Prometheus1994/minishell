@@ -6,19 +6,11 @@
 /*   By: ytlidi <ytlidi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 16:46:50 by ytlidi            #+#    #+#             */
-/*   Updated: 2025/07/04 21:34:14 by ytlidi           ###   ########.fr       */
+/*   Updated: 2025/07/05 19:34:19 by ytlidi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
-void filling_type_s_or_d_quote(t_token *list)
-{
-	if (list->token[0] == '\'')
-		list->type = TOKEN_S_QUOTE;
-	if (list->token[0] == '"')
-		list->type = TOKEN_D_QUOTE;
-}
 
 int quote_tokens(char *str, t_token **list, int *i)
 {
@@ -36,26 +28,10 @@ int quote_tokens(char *str, t_token **list, int *i)
 		j = *i;
 		(*i)++;
 		flag = 1;
-		while (((str[*i] != ' ' && !(str[*i] >= 9 && str[*i] <= 13))
-			|| flag % 2 == 1) && str[*i] != '\0')
-		{
-			if ((flag % 2 == 0 && (str[*i] == '\'' || str[*i] == '"'))
-				|| (flag % 2 == 1 && str[*i] == q))
-			{
-				q = str[*i];
-				flag++;
-			}
-			(*i)++;
-		}
-		if (*i > j)
-		{
-			s = ft_substr(str, j, *i - j + 1); //free
-			if (s == NULL)
-				return (1);
-			token = ft_lstnew_token(s); //free
-			filling_type_s_or_d_quote(token);
-			ft_lstadd_back_token(list, token);
-		}
+		while (inner_word_or_quote_skipping_condition(str, *i, flag, 1))
+			inner_word_or_quote_skipping(str, i, &flag, &q);
+		if (add_token_string_to_token_list(str, *i, j, list))
+			return (1);
 		(*i)++;
 	}
 	return (0);
@@ -129,27 +105,10 @@ int word_tokens(char *str, t_token **list, int *i)
 	   	
 	j = *i;
 	flag = 0;
-	while (((str[*i] != ' ' && !(str[*i] >= 9 && str[*i] <= 13)
-		&& str[*i] != '|' && str[*i] != '>' && str[*i] != '<') || flag % 2 == 1)
-		&& str[*i] != '\0')
-	{
-		if ((flag % 2 == 0 && (str[*i] == '\'' || str[*i] == '"'))
-			|| (flag % 2 == 1 && str[*i] == q))
-		{
-			q = str[*i];
-			flag++;
-		}
-		(*i)++;
-	}
-	if (*i > j)
-	{
-		s = ft_substr(str, j, *i - j); //free
-		if (s == NULL)
-			return (1);
-		token = ft_lstnew_token(s); //free
-		token->type = TOKEN_WORD; //not necessary (it's 0 by default)
-		ft_lstadd_back_token(list, token);
-	}
+	while (inner_word_or_quote_skipping_condition(str, *i, flag, 0))
+		inner_word_or_quote_skipping(str, i, &flag, &q);
+	if (add_token_string_to_token_list(str, *i, j, list))
+		return (1);
 	return (0);
 }
 
@@ -169,19 +128,6 @@ int words_count(t_token *beginning)
 		i++;
 	}
 	return i;
-}
-
-void	expanding(char *new_str, int *j, char *str_to_add)
-{
-	int	i;
-
-	i = 0;
-	while (str_to_add[i] != '\0')
-	{
-		new_str[*j] = str_to_add[i];
-		i++;
-		(*j)++;
-	}
 }
 
 int	calc_new_str_len(char *str, t_env *env)
@@ -210,59 +156,28 @@ int	calc_new_str_len(char *str, t_env *env)
 
 char	*remove_quote(t_token *token, t_env *env)
 {
-	int		i;
-	int		j;
-	int		flag;
 	char	*str;
 	char	*new_str;
-	char	quote;
+	char	q;
 	t_env	*env_line;
 
-	i = 0;
+	int (i), (j), (continue_flag), flag = 0;
 	j = 0;
-	flag = 0;
-	if (token->type >= 4 && token->type <= 7)
-		str = token->next->token;
-	else
-		str = token->token;
-	new_str = malloc(calc_new_str_len(str, env) + 1); //free
+	remove_quote_func_init(&i, token, &new_str, env);
 	while (str[i] != '\0')
 	{
-		if ((flag % 2 == 0 && (str[i] == '\'' || str[i] == '"'))
-			|| (flag % 2 == 1 && str[i] == quote))
-		{
-			quote = str[i];
-			flag++;
-			i++;
-			continue;
-		}
-		if ((str[i] == '$' && ((flag % 2 == 1 && quote == '"')
+		continue_flag = skipping_if_quote_mark(str, &i, &flag, &q);
+		if ((str[i] == '$' && ((flag % 2 == 1 && q == '"')
 			|| flag % 2 == 0)) && token->type != TOKEN_HEREDOC)
 		{
-			i++;
-			if ((str[i] == ' ' || (str[i] >= 9 && str[i] <= 13))
-				|| str[i] == '\0' || str[i] == '"')
-			{
-				new_str[j] = '$';
-				j++;
-				continue;
-			}
+			continue_flag = printing_dollar(new_str, &j, str, &i);
 			env_line = find_env_exp(env, &str[i]);
-			if (env_line == NULL)
-			{
-				i += strlen_before_spaces_or_delimiter(&str[i]);
-				continue;
-			}
-			if (env_line != NULL)
-			{
-				expanding(new_str, &j, env_line->value);
-				i += ft_strlen(env_line->key);
-				continue;
-			}
+			continue_flag = expanding_to_an_empty_string(str, &i, env_line);
+			continue_flag = expanding_to_a_real_value(new_str, &j, &i, env_line);
 		}
-		new_str[j] = str[i];
-		i++;
-		j++;
+		if (continue_flag == 1)
+			continue;
+		new_str[j++] = str[i++];
 	}
 	new_str[j] = '\0';
 	if (flag % 2 == 1)
