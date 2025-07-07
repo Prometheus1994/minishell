@@ -6,153 +6,11 @@
 /*   By: ytlidi <ytlidi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 16:46:50 by ytlidi            #+#    #+#             */
-/*   Updated: 2025/07/05 21:23:32 by ytlidi           ###   ########.fr       */
+/*   Updated: 2025/07/06 12:47:33 by ytlidi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
-int quote_tokens(char *str, t_token **list, int *i)
-{
-	char	q;
-	int		j;
-	char	*s;
-	t_token	*token;
-	int		flag;
-
-	while (str[*i] == ' ' || (str[*i] >= 9 && str[*i] <= 13))
-		(*i)++;
-	if (str[*i] == '\'' || str[*i] == '"')
-	{
-		q = str[*i];
-		j = *i;
-		(*i)++;
-		flag = 1;
-		while (inner_word_or_quote_skipping_condition(str, *i, flag, 1))
-			inner_word_or_quote_skipping(str, i, &flag, &q);
-		if (add_token_string_to_token_list(str, *i, j, list))
-			return (1);
-		(*i)++;
-	}
-	return (0);
-}
-
-void filling_type_pipe_or_rd(t_token *list)
-{
-	if (list->token[1] == '\0')
-	{
-		if (list->token[0] == '|')
-			list->type = TOKEN_PIPE;
-		if (list->token[0] == '>')
-			list->type = TOKEN_RD_OUT;
-		if (list->token[0] == '<')
-			list->type = TOKEN_RD_IN;
-	}
-	else
-	{
-		if (list->token[1] == '>')
-			list->type = TOKEN_APPEND;
-		if (list->token[1] == '<')
-			list->type = TOKEN_HEREDOC;
-	}
-}
-
-int inner_pipes_and_rds_tokens(char *str, t_token **list, int **i, int s_or_d)
-{
-	char 	*s;
-	int		j;
-	t_token	*token;
-
-	s = malloc(s_or_d + 1); //free
-	if (s == NULL)
-		return (1);
-	j = 0;
-	while (j < s_or_d)
-	{
-		s[j] = str[**i];
-		j++;
-	}
-	s[j] = '\0';
-	token = ft_lstnew_token(s); //free
-	filling_type_pipe_or_rd(token);
-	ft_lstadd_back_token(list, token);
-	**i += s_or_d;
-	return (0);
-}
-
-int pipes_and_rds_tokens(char *str, t_token **list, int *i)
-{
-	char	rd;
-
-	if (str[*i] == '|' || str[*i] == '>' || str[*i] == '<')
-	{
-		rd = str[*i];
-		if (str[*i + 1] == rd && rd != '|')
-			return (inner_pipes_and_rds_tokens(str, list, &i, 2));
-		else
-			return (inner_pipes_and_rds_tokens(str, list, &i, 1));
-	}
-	return (0);
-}
-
-int word_tokens(char *str, t_token **list, int *i)
-{
-	int		j;
-	char	*s;
-	char	q;
-	t_token *token;
-	int		flag;
-	   	
-	j = *i;
-	flag = 0;
-	while (inner_word_or_quote_skipping_condition(str, *i, flag, 0))
-		inner_word_or_quote_skipping(str, i, &flag, &q);
-	if (add_token_string_to_token_list(str, *i, j, list))
-		return (1);
-	return (0);
-}
-
-int words_count(t_token *beginning)
-{
-	int		i;
-	t_token	*current;
-
-	current = beginning;
-	i = 0;
-	while (current != NULL && current->type != TOKEN_PIPE)
-	{
-		if (current->type >= 4 && current->type <= 7)
-			current = current->next->next;
-		else
-			current = current->next;
-		i++;
-	}
-	return i;
-}
-
-int	calc_new_str_len(char *str, t_env *env)
-{
-	int	i;
-	int len;
-	t_env	*env_line;
-
-	i = 0;
-	len = 0;
-	while (str[i] != '\0')
-	{
-		if (str[i] == '$')
-		{
-			i++;
-			len++;
-			env_line = find_env_exp(env, &str[i]);
-			if (env_line != NULL)
-				len += ft_strlen(env_line->value);
-		}
-		i++;
-		len++;
-	}
-	return len;
-}
 
 char	*remove_quote(t_token *token, t_env *env)
 {
@@ -248,7 +106,7 @@ t_command	*filling_cmd_list(t_token *token_list, int pipe_flag, t_env *env)
 		args = inner_filling_cmd_list(&current_token, &redirection_list, env);
 		if (args == NULL)
 			return (NULL);
-		command = ft_lstnew_command(args); //free
+		command = ft_lstnew_command(args); //freed
 		if (pipe_flag == 1)
 			command->pipe_in = 1;
 		pipe_flag = 1;
@@ -258,7 +116,7 @@ t_command	*filling_cmd_list(t_token *token_list, int pipe_flag, t_env *env)
 		if (current_token != NULL)
 			current_token = current_token->next;
 	}
-	return (command_list);
+	return (free(command), command_list);
 }
 
 t_command	*parse_input(char *str, t_env *env)

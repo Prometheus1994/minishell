@@ -6,7 +6,7 @@
 /*   By: ytlidi <ytlidi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/02 18:38:34 by ytlidi            #+#    #+#             */
-/*   Updated: 2025/07/05 15:06:46 by ytlidi           ###   ########.fr       */
+/*   Updated: 2025/07/06 12:47:57 by ytlidi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,4 +51,46 @@ int	strlen_before_spaces_or_delimiter(char *str)
 		&& str[i] != '.' && str[i] != ',' && str[i] != ';' && str[i] != ':')
 		i++;
 	return (i);
+}
+
+int words_count(t_token *beginning)
+{
+	int		i;
+	t_token	*current;
+
+	current = beginning;
+	i = 0;
+	while (current != NULL && current->type != TOKEN_PIPE)
+	{
+		if (current->type >= 4 && current->type <= 7)
+			current = current->next->next;
+		else
+			current = current->next;
+		i++;
+	}
+	return i;
+}
+
+int	calc_new_str_len(char *str, t_env *env)
+{
+	int	i;
+	int len;
+	t_env	*env_line;
+
+	i = 0;
+	len = 0;
+	while (str[i] != '\0')
+	{
+		if (str[i] == '$')
+		{
+			i++;
+			len++;
+			env_line = find_env_exp(env, &str[i]);
+			if (env_line != NULL)
+				len += ft_strlen(env_line->value);
+		}
+		i++;
+		len++;
+	}
+	return len;
 }

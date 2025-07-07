@@ -6,7 +6,7 @@
 /*   By: ytlidi <ytlidi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 16:41:42 by ytlidi            #+#    #+#             */
-/*   Updated: 2025/07/05 21:08:03 by ytlidi           ###   ########.fr       */
+/*   Updated: 2025/07/06 12:48:46 by ytlidi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,3 +118,10 @@ char			*remove_quote_func_init(int *i, t_token *token, char **new_str, t_env *en
 int				calc_new_str_len(char *str, t_env *env);
 int				expand_condition(char *str, int i, int flag, char q);
 int				in_case_of_quote_not_closed(char *new_str, int j, int flag);
+void			filling_type_pipe_or_rd(t_token *list);
+int				inner_pipes_and_rds_tokens(char *str, t_token **list, int **i, int s_or_d);
+int				quote_tokens(char *str, t_token **list, int *i);
+int				pipes_and_rds_tokens(char *str, t_token **list, int *i);
+int				word_tokens(char *str, t_token **list, int *i);
+int				words_count(t_token *beginning);
+int				calc_new_str_len(char *str, t_env *env);
