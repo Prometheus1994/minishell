@@ -10,4 +10,4 @@ SRC =	ft_lstadd_back.c ft_lstnew.c ft_split.c ft_strdup.c \
 		removing_quote_marks_functions.c \
 		expansion_inner_functions.c tokenization.c
 all :
-	cc  $(SRC) -lreadline
+	cc  $(SRC) -fsanitize=address -lreadline

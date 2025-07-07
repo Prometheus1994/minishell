@@ -6,7 +6,7 @@
 /*   By: ytlidi <ytlidi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 16:46:50 by ytlidi            #+#    #+#             */
-/*   Updated: 2025/07/06 12:47:33 by ytlidi           ###   ########.fr       */
+/*   Updated: 2025/07/07 18:18:19 by ytlidi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,7 +106,7 @@ t_command	*filling_cmd_list(t_token *token_list, int pipe_flag, t_env *env)
 		args = inner_filling_cmd_list(&current_token, &redirection_list, env);
 		if (args == NULL)
 			return (NULL);
-		command = ft_lstnew_command(args); //freed
+		command = ft_lstnew_command(args); //free
 		if (pipe_flag == 1)
 			command->pipe_in = 1;
 		pipe_flag = 1;
@@ -116,7 +116,7 @@ t_command	*filling_cmd_list(t_token *token_list, int pipe_flag, t_env *env)
 		if (current_token != NULL)
 			current_token = current_token->next;
 	}
-	return (free(command), command_list);
+	return (command_list);
 }
 
 t_command	*parse_input(char *str, t_env *env)
